@@ -92,7 +92,7 @@ public class PetalProvider extends BotaniaRecipeProvider {
 		consumer.accept(make(ModSubtiles.rosaArcana, pink, pink, purple, purple, lime, runeMana));
 		consumer.accept(make(ModSubtiles.munchdew, lime, lime, red, red, green, runeGluttony));
 		consumer.accept(make(ModSubtiles.entropinnyum, red, red, gray, gray, white, white, runeWrath, runeFire));
-		consumer.accept(make(ModSubtiles.kekimurus, white, white, orange, orange, brown, brown, runeGluttony, pixieDust));
+		consumer.accept(make(ModSubtiles.kekimurus, white, white, red, red, brown, brown, runeGluttony, pixieDust));
 		consumer.accept(make(ModSubtiles.gourmaryllis, lightGray, lightGray, yellow, yellow, red, runeFire, runeSummer));
 		consumer.accept(make(ModSubtiles.narslimmus, lime, lime, green, green, black, runeSummer, runeWater));
 		consumer.accept(make(ModSubtiles.spectrolus, red, red, green, green, blue, blue, white, white, runeWinter, runeAir, pixieDust));
