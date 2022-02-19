@@ -164,6 +164,8 @@ public final class LibBlockNames {
 	public static final String WALL_SUFFIX = "_wall";
 	public static final String FENCE_SUFFIX = "_fence";
 	public static final String FENCE_GATE_SUFFIX = "_fence_gate";
+	public static final String DOOR_SUFFIX = "_door";
+	public static final String TRAPDOOR_SUFFIX = "_trapdoor";
 
 	public static final ResourceLocation SUBTILE_PUREDAISY = prefix("pure_daisy");
 	public static final ResourceLocation SUBTILE_MANASTAR = prefix("manastar");

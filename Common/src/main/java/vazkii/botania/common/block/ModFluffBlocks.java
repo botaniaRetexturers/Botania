@@ -12,19 +12,14 @@ import net.minecraft.core.Registry;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.FenceBlock;
-import net.minecraft.world.level.block.FenceGateBlock;
-import net.minecraft.world.level.block.RotatedPillarBlock;
-import net.minecraft.world.level.block.SlabBlock;
-import net.minecraft.world.level.block.SoundType;
-import net.minecraft.world.level.block.WallBlock;
+import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.material.Material;
 
+import vazkii.botania.common.block.decor.door.BlockModDoor;
 import vazkii.botania.common.block.decor.panes.BlockModPane;
 import vazkii.botania.common.block.decor.stairs.BlockModStairs;
+import vazkii.botania.common.block.decor.trapdoor.BlockModTrapDoor;
 import vazkii.botania.common.item.ModItems;
 import vazkii.botania.common.lib.LibBlockNames;
 
@@ -45,6 +40,8 @@ public final class ModFluffBlocks {
 	public static final Block livingwoodStrippedWall = new WallBlock(BlockBehaviour.Properties.copy(livingwood));
 	public static final Block livingwoodPlankStairs = new BlockModStairs(livingwoodPlanks.defaultBlockState(), BlockBehaviour.Properties.copy(livingwoodPlanks));
 	public static final Block livingwoodPlankSlab = new SlabBlock(BlockBehaviour.Properties.copy(livingwoodPlanks));
+	public static final Block livingwoodDoor = new BlockModDoor(BlockBehaviour.Properties.copy(livingwoodPlanks));
+	public static final Block livingwoodTrapDoor = new BlockModTrapDoor(BlockBehaviour.Properties.copy(livingwoodPlanks));
 
 	public static final Block livingrockStairs = new BlockModStairs(livingrock.defaultBlockState(), BlockBehaviour.Properties.copy(livingrock));
 	public static final Block livingrockSlab = new SlabBlock(BlockBehaviour.Properties.copy(livingrock));
@@ -66,6 +63,8 @@ public final class ModFluffBlocks {
 	public static final Block dreamwoodStrippedWall = new WallBlock(BlockBehaviour.Properties.copy(dreamwood));
 	public static final Block dreamwoodPlankStairs = new BlockModStairs(dreamwoodPlanks.defaultBlockState(), BlockBehaviour.Properties.copy(dreamwoodPlanks));
 	public static final Block dreamwoodPlankSlab = new SlabBlock(BlockBehaviour.Properties.copy(dreamwoodPlanks));
+	public static final Block dreamwoodDoor = new BlockModDoor(BlockBehaviour.Properties.copy(dreamwoodPlanks));
+	public static final Block dreamwoodTrapDoor = new BlockModTrapDoor(BlockBehaviour.Properties.copy(dreamwoodPlanks));
 
 	public static final Block darkQuartz = new BlockMod(BlockBehaviour.Properties.copy(Blocks.QUARTZ_BLOCK));
 	public static final Block darkQuartzChiseled = new BlockMod(BlockBehaviour.Properties.copy(darkQuartz));
@@ -259,6 +258,8 @@ public final class ModFluffBlocks {
 		r.accept(livingwoodPlankSlab, prefix(LibBlockNames.LIVING_WOOD_PLANKS + SLAB_SUFFIX));
 		r.accept(livingwoodFence, prefix(LibBlockNames.LIVING_WOOD + FENCE_SUFFIX));
 		r.accept(livingwoodFenceGate, prefix(LibBlockNames.LIVING_WOOD + FENCE_GATE_SUFFIX));
+		r.accept(livingwoodDoor, prefix(LibBlockNames.LIVING_WOOD + DOOR_SUFFIX));
+		r.accept(livingwoodTrapDoor, prefix(LibBlockNames.LIVING_WOOD + TRAPDOOR_SUFFIX));
 
 		r.accept(livingrockStairs, prefix(LibBlockNames.LIVING_ROCK + STAIR_SUFFIX));
 		r.accept(livingrockSlab, prefix(LibBlockNames.LIVING_ROCK + SLAB_SUFFIX));
@@ -282,6 +283,8 @@ public final class ModFluffBlocks {
 		r.accept(dreamwoodPlankSlab, prefix(LibBlockNames.DREAM_WOOD_PLANKS + SLAB_SUFFIX));
 		r.accept(dreamwoodFence, prefix(LibBlockNames.DREAM_WOOD + FENCE_SUFFIX));
 		r.accept(dreamwoodFenceGate, prefix(LibBlockNames.DREAM_WOOD + FENCE_GATE_SUFFIX));
+		r.accept(dreamwoodDoor, prefix(LibBlockNames.DREAM_WOOD + DOOR_SUFFIX));
+		r.accept(dreamwoodTrapDoor, prefix(LibBlockNames.DREAM_WOOD + TRAPDOOR_SUFFIX));
 
 		r.accept(darkQuartz, prefix(QUARTZ_DARK));
 		r.accept(darkQuartzChiseled, prefix("chiseled_" + QUARTZ_DARK));
@@ -472,6 +475,8 @@ public final class ModFluffBlocks {
 		r.accept(new BlockItem(livingwoodWall, props), Registry.BLOCK.getKey(livingwoodWall));
 		r.accept(new BlockItem(livingwoodFence, props), Registry.BLOCK.getKey(livingwoodFence));
 		r.accept(new BlockItem(livingwoodFenceGate, props), Registry.BLOCK.getKey(livingwoodFenceGate));
+		r.accept(new BlockItem(livingwoodDoor, props), Registry.BLOCK.getKey(livingwoodDoor));
+		r.accept(new BlockItem(livingwoodTrapDoor, props), Registry.BLOCK.getKey(livingwoodTrapDoor));
 
 		r.accept(new BlockItem(livingwoodStrippedStairs, props), Registry.BLOCK.getKey(livingwoodStrippedStairs));
 		r.accept(new BlockItem(livingwoodStrippedSlab, props), Registry.BLOCK.getKey(livingwoodStrippedSlab));
@@ -497,6 +502,8 @@ public final class ModFluffBlocks {
 		r.accept(new BlockItem(dreamwoodWall, props), Registry.BLOCK.getKey(dreamwoodWall));
 		r.accept(new BlockItem(dreamwoodFence, props), Registry.BLOCK.getKey(dreamwoodFence));
 		r.accept(new BlockItem(dreamwoodFenceGate, props), Registry.BLOCK.getKey(dreamwoodFenceGate));
+		r.accept(new BlockItem(dreamwoodDoor, props), Registry.BLOCK.getKey(dreamwoodDoor));
+		r.accept(new BlockItem(dreamwoodTrapDoor, props), Registry.BLOCK.getKey(dreamwoodTrapDoor));
 
 		r.accept(new BlockItem(dreamwoodStrippedStairs, props), Registry.BLOCK.getKey(dreamwoodStrippedStairs));
 		r.accept(new BlockItem(dreamwoodStrippedSlab, props), Registry.BLOCK.getKey(dreamwoodStrippedSlab));

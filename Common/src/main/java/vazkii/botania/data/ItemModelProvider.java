@@ -27,10 +27,7 @@ import net.minecraft.data.models.model.TextureSlot;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.IronBarsBlock;
-import net.minecraft.world.level.block.WallBlock;
+import net.minecraft.world.level.block.*;
 
 import vazkii.botania.api.BotaniaAPI;
 import vazkii.botania.common.block.*;
@@ -461,6 +458,10 @@ public class ItemModelProvider implements DataProvider {
 
 		takeAll(itemBlocks, i -> i instanceof ItemPetal).forEach(i -> {
 			ModelTemplates.FLAT_ITEM.create(ModelLocationUtils.getModelLocation(i), TextureMapping.layer0(prefix("item/petal")), consumer);
+		});
+
+		takeAll(itemBlocks, i -> i.getBlock() instanceof DoorBlock).forEach(i -> {
+			ModelTemplates.FLAT_ITEM.create(ModelLocationUtils.getModelLocation(i), TextureMapping.layer0(prefix("item/" + i)), consumer);
 		});
 
 		takeAll(itemBlocks, Stream.of(ModBlocks.dreamwoodLog, ModBlocks.dreamwood, ModBlocks.dreamwoodLogStripped,

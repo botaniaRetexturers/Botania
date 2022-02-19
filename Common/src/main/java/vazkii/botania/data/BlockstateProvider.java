@@ -29,11 +29,7 @@ import net.minecraft.data.models.model.TextureMapping;
 import net.minecraft.data.models.model.TextureSlot;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.DyeColor;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.SlabBlock;
-import net.minecraft.world.level.block.StairBlock;
-import net.minecraft.world.level.block.TallFlowerBlock;
+import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.properties.*;
 
 import vazkii.botania.api.BotaniaAPI;
@@ -644,6 +640,17 @@ public class BlockstateProvider implements DataProvider {
 			}
 		});
 
+		takeAll(remainingBlocks, b -> b instanceof DoorBlock).forEach(doorBlock -> {
+			var topTexture = getBlockTexture(doorBlock, "_top");
+			var bottomTexture = getBlockTexture(doorBlock, "_bottom");
+			doorBlock(doorBlock, topTexture, bottomTexture);
+		});
+
+		takeAll(remainingBlocks, b -> b instanceof TrapDoorBlock).forEach(trapdoorBlock -> {
+			var texture = getBlockTexture(trapdoorBlock);
+			trapdoorBlock(trapdoorBlock, texture);
+		});
+
 		remainingBlocks.forEach(this::cubeAll);
 	}
 
@@ -842,6 +849,23 @@ public class BlockstateProvider implements DataProvider {
 		var openWallModel = ModelTemplates.FENCE_GATE_WALL_OPEN.create(block, mapping, this.modelOutput);
 		var closedWallModel = ModelTemplates.FENCE_GATE_WALL_CLOSED.create(block, mapping, this.modelOutput);
 		this.blockstates.add(AccessorBlockModelGenerators.makeFenceGateState(block, openModel, closedModel, openWallModel, closedWallModel));
+	}
+
+	protected void doorBlock(Block block, ResourceLocation topTexture, ResourceLocation bottomTexture) {
+		var mapping = TextureMapping.door(topTexture, bottomTexture);
+		var bottomHalfModel = ModelTemplates.DOOR_BOTTOM.create(block, mapping, this.modelOutput);
+		var bottomHalfRightHingeModel = ModelTemplates.DOOR_BOTTOM_HINGE.create(block, mapping, this.modelOutput);
+		var topHalfModel = ModelTemplates.DOOR_TOP.create(block, mapping, this.modelOutput);
+		var topHalfRightHingeModel = ModelTemplates.DOOR_TOP_HINGE.create(block, mapping, this.modelOutput);
+		this.blockstates.add(AccessorBlockModelGenerators.makeDoorState(block, bottomHalfModel, bottomHalfRightHingeModel, topHalfModel, topHalfRightHingeModel));
+	}
+
+	protected void trapdoorBlock(Block block, ResourceLocation texture) {
+		var mapping = TextureMapping.defaultTexture(texture);
+		var topModel = ModelTemplates.ORIENTABLE_TRAPDOOR_TOP.create(block, mapping, this.modelOutput);
+		var bottomModel = ModelTemplates.ORIENTABLE_TRAPDOOR_BOTTOM.create(block, mapping, this.modelOutput);
+		var openModel = ModelTemplates.ORIENTABLE_TRAPDOOR_OPEN.create(block, mapping, this.modelOutput);
+		this.blockstates.add(AccessorBlockModelGenerators.makeTrapdoorState(block, topModel, bottomModel, openModel));
 	}
 
 	protected void cubeAll(Block b) {
