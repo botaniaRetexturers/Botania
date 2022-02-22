@@ -58,6 +58,7 @@ import vazkii.botania.api.item.IBlockProvider;
 import vazkii.botania.api.item.ICoordBoundItem;
 import vazkii.botania.api.mana.ManaBlockType;
 import vazkii.botania.api.mana.ManaNetworkAction;
+import vazkii.botania.common.block.tile.string.TileRedStringContainer;
 import vazkii.botania.common.handler.EquipmentHandler;
 import vazkii.botania.common.internal_caps.*;
 import vazkii.botania.network.IPacket;
@@ -170,6 +171,12 @@ public interface IXplatAbstractions {
 	int getSmeltingBurnTime(ItemStack stack);
 	boolean preventsRemoteMovement(ItemEntity entity);
 	void addAxeStripping(Block input, Block output);
+	int transferEnergyToNeighbors(Level level, BlockPos pos, int energy);
+	int getEnergyMultiplier();
+
+	// Red string container
+	boolean isRedStringContainerTarget(BlockEntity be);
+	TileRedStringContainer newRedStringContainer(BlockPos pos, BlockState state);
 
 	IXplatAbstractions INSTANCE = find();
 

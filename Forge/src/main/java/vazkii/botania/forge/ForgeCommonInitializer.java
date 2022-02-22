@@ -34,6 +34,8 @@ import net.minecraft.world.level.levelgen.GenerationStep;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.ToolActions;
 import net.minecraftforge.common.world.ForgeWorldPreset;
+import net.minecraftforge.energy.CapabilityEnergy;
+import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.event.*;
 import net.minecraftforge.event.entity.EntityAttributeCreationEvent;
 import net.minecraftforge.event.entity.EntityAttributeModificationEvent;
@@ -87,6 +89,8 @@ import vazkii.botania.common.block.subtile.functional.SubTileTigerseye;
 import vazkii.botania.common.block.subtile.functional.SubTileVinculotus;
 import vazkii.botania.common.block.tile.*;
 import vazkii.botania.common.block.tile.corporea.TileCorporeaIndex;
+import vazkii.botania.common.block.tile.mana.TileRFGenerator;
+import vazkii.botania.common.block.tile.string.TileRedStringContainer;
 import vazkii.botania.common.brew.ModBrews;
 import vazkii.botania.common.brew.ModPotions;
 import vazkii.botania.common.command.SkyblockCommand;
@@ -117,6 +121,7 @@ import vazkii.botania.common.world.SkyblockChunkGenerator;
 import vazkii.botania.common.world.SkyblockWorldEvents;
 import vazkii.botania.forge.integration.corporea.ForgeCapCorporeaNodeDetector;
 import vazkii.botania.forge.integration.curios.CurioIntegration;
+import vazkii.botania.forge.internal_caps.RedStringContainerCapProvider;
 import vazkii.botania.forge.network.ForgePacketHandler;
 import vazkii.botania.forge.xplat.ForgeXplatImpl;
 import vazkii.botania.xplat.BotaniaConfig;
@@ -199,16 +204,18 @@ public class ForgeCommonInitializer {
 		// Worldgen
 		bind(ForgeRegistries.FEATURES, ModFeatures::registerFeatures);
 		SkyblockChunkGenerator.init();
-		modBus.addGenericListener(ForgeWorldPreset.class, (RegistryEvent.Register<ForgeWorldPreset> e) -> {
-			ForgeWorldPreset preset = new ForgeWorldPreset(SkyblockChunkGenerator::createForWorldType) {
-				@Override
-				public String getTranslationKey() {
-					return "generator.botania-skyblock";
-				}
-			};
-			preset.setRegistryName(prefix("gardenofglass"));
-			e.getRegistry().register(preset);
-		});
+		if (IXplatAbstractions.INSTANCE.gogLoaded()) {
+			modBus.addGenericListener(ForgeWorldPreset.class, (RegistryEvent.Register<ForgeWorldPreset> e) -> {
+				ForgeWorldPreset preset = new ForgeWorldPreset(SkyblockChunkGenerator::createForWorldType) {
+					@Override
+					public String getTranslationKey() {
+						return "generator.botania-skyblock";
+					}
+				};
+				preset.setRegistryName(prefix("gardenofglass"));
+				e.getRegistry().register(preset);
+			});
+		}
 
 		// Rest
 		ModCriteriaTriggers.init();
@@ -287,7 +294,7 @@ public class ForgeCommonInitializer {
 		bus.addListener((ServerAboutToStartEvent e) -> this.serverAboutToStart(e.getServer()));
 		bus.addListener((ServerStoppingEvent e) -> this.serverStopping(e.getServer()));
 		bus.addListener((PlayerEvent.PlayerLoggedOutEvent e) -> ItemFlightTiara.playerLoggedOut((ServerPlayer) e.getPlayer()));
-		bus.addListener((PlayerEvent.PlayerRespawnEvent e) -> ItemKeepIvy.onPlayerRespawn(e.getPlayer(), e.getPlayer(), e.isEndConquered())); // TODO: This is probably incorrect
+		bus.addListener((PlayerEvent.Clone e) -> ItemKeepIvy.onPlayerRespawn(e.getOriginal(), e.getPlayer(), !e.isWasDeath()));
 		bus.addListener((TickEvent.WorldTickEvent e) -> {
 			if (e.phase == TickEvent.Phase.END && e.world instanceof ServerLevel level) {
 				CommonTickHandler.onTick(level);
@@ -308,11 +315,13 @@ public class ForgeCommonInitializer {
 		});
 
 		// Below here are events implemented via Mixins on the Fabric side, ordered by Mixin name
+		// FabricMixinAnvilMenu
 		bus.addListener((AnvilUpdateEvent e) -> {
 			if (ItemSpellCloth.shouldDenyAnvil(e.getLeft(), e.getRight())) {
 				e.setCanceled(true);
 			}
 		});
+		// FabricMixinAxeItem
 		bus.addListener((BlockEvent.BlockToolInteractEvent e) -> {
 			if (e.getToolAction() == ToolActions.AXE_STRIP) {
 				BlockState input = e.getState();
@@ -322,6 +331,7 @@ public class ForgeCommonInitializer {
 				}
 			}
 		});
+		// FabricMixinEnderMan
 		bus.addListener((EntityTeleportEvent.EnderEntity e) -> {
 			if (e.getEntityLiving() instanceof EnderMan em) {
 				var newPos = SubTileVinculotus.onEndermanTeleport(em, e.getTargetX(), e.getTargetY(), e.getTargetZ());
@@ -332,32 +342,38 @@ public class ForgeCommonInitializer {
 				}
 			}
 		});
+		// FabricMixinExplosion
 		bus.addListener((ExplosionEvent e) -> {
 			if (ItemGoddessCharm.shouldProtectExplosion(e.getWorld(), e.getExplosion().getPosition())) {
 				e.getExplosion().clearToBlow();
 			}
 		});
+		// FabricMixinItemEntity
 		bus.addListener((EntityItemPickupEvent e) -> {
 			if (ItemFlowerBag.onPickupItem(e.getItem(), e.getPlayer())) {
 				e.setCanceled(true);
 			}
 		});
-		bus.addListener((LivingDropsEvent e) -> {
-			var living = e.getEntityLiving();
-			ItemElementiumAxe.onEntityDrops(e.isRecentlyHit(), e.getSource(), e.getEntityLiving(), stack -> {
-				var ent = new ItemEntity(living.level, living.getX(), living.getY(), living.getZ(), stack);
-				ent.setDefaultPickUpDelay();
-				e.getDrops().add(ent);
+		// FabricMixinLivingEntity
+		{
+			bus.addListener((LivingDropsEvent e) -> {
+				var living = e.getEntityLiving();
+				ItemElementiumAxe.onEntityDrops(e.isRecentlyHit(), e.getSource(), e.getEntityLiving(), stack -> {
+					var ent = new ItemEntity(living.level, living.getX(), living.getY(), living.getZ(), stack);
+					ent.setDefaultPickUpDelay();
+					e.getDrops().add(ent);
+				});
+				SubTileLoonuim.dropLooniumItems(living, stack -> {
+					e.getDrops().clear();
+					var ent = new ItemEntity(living.level, living.getX(), living.getY(), living.getZ(), stack);
+					ent.setDefaultPickUpDelay();
+					e.getDrops().add(ent);
+				});
 			});
-			SubTileLoonuim.dropLooniumItems(living, stack -> {
-				e.getDrops().clear();
-				var ent = new ItemEntity(living.level, living.getX(), living.getY(), living.getZ(), stack);
-				ent.setDefaultPickUpDelay();
-				e.getDrops().add(ent);
-			});
-		});
-		bus.addListener((LivingEvent.LivingJumpEvent e) -> ItemTravelBelt.onPlayerJump(e.getEntityLiving()));
-		{ // todo missing rest of FabricMixinPlayer. remove braces when done.
+			bus.addListener((LivingEvent.LivingJumpEvent e) -> ItemTravelBelt.onPlayerJump(e.getEntityLiving()));
+		}
+		// FabricMixinPlayer
+		{
 			bus.addListener((LivingAttackEvent e) -> {
 				if (e.getEntityLiving() instanceof Player player
 						&& ItemOdinRing.onPlayerAttacked(player, e.getSource())) {
@@ -392,7 +408,6 @@ public class ForgeCommonInitializer {
 					e.setDistance(ItemTravelBelt.onPlayerFall(player, e.getDistance()));
 				}
 			});
-			// todo keepivy
 			bus.addListener(EventPriority.LOW, (CriticalHitEvent e) -> {
 				Event.Result result = e.getResult();
 				if (e.getPlayer().level.isClientSide
@@ -407,7 +422,9 @@ public class ForgeCommonInitializer {
 			});
 
 		}
+		// FabricMixinResultSlot
 		bus.addListener((PlayerEvent.ItemCraftedEvent e) -> ItemCraftingHalo.onItemCrafted(e.getPlayer(), e.getInventory()));
+		// FabricMixinServerGamePacketListenerImpl
 		bus.addListener(EventPriority.HIGH, (ServerChatEvent e) -> {
 			if (TileCorporeaIndex.getInputHandler().onChatMessage(e.getPlayer(), e.getMessage())) {
 				e.setCanceled(true);
@@ -505,6 +522,42 @@ public class ForgeCommonInitializer {
 			e.addCapability(prefix("inv"), CapabilityUtil.makeProvider(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, new SidedInvWrapper(inv, null)));
 		}
 
+		if (be instanceof TileRFGenerator gen) {
+			// we only provide a view of the energy level, no interaction allowed
+			var energyStorage = new IEnergyStorage() {
+				@Override
+				public int getEnergyStored() {
+					return gen.getEnergy();
+				}
+
+				@Override
+				public int getMaxEnergyStored() {
+					return TileRFGenerator.MAX_ENERGY;
+				}
+
+				@Override
+				public boolean canExtract() {
+					return false;
+				}
+
+				@Override
+				public int extractEnergy(int maxExtract, boolean simulate) {
+					return 0;
+				}
+
+				@Override
+				public int receiveEnergy(int maxReceive, boolean simulate) {
+					return 0;
+				}
+
+				@Override
+				public boolean canReceive() {
+					return false;
+				}
+			};
+			e.addCapability(prefix("fe"), CapabilityUtil.makeProvider(CapabilityEnergy.ENERGY, energyStorage));
+		}
+
 		if (be.getType() == ModTiles.ANIMATED_TORCH) {
 			e.addCapability(prefix("hourglass_trigger"), CapabilityUtil.makeProvider(BotaniaForgeCapabilities.HOURGLASS_TRIGGER,
 					hourglass -> ((TileAnimatedTorch) be).toggle()));
@@ -513,6 +566,10 @@ public class ForgeCommonInitializer {
 		if (SELF_WANDADBLE_BES.get().contains(be.getType())) {
 			e.addCapability(prefix("wandable"), CapabilityUtil.makeProvider(BotaniaForgeCapabilities.WANDABLE,
 					(IWandable) be));
+		}
+
+		if (be instanceof TileRedStringContainer container) {
+			e.addCapability(prefix("red_string"), new RedStringContainerCapProvider(container));
 		}
 	}
 

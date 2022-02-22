@@ -14,7 +14,6 @@ import net.minecraft.network.chat.TranslatableComponent;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeType;
-import net.minecraft.world.level.block.Blocks;
 
 import vazkii.botania.api.recipe.IOrechidRecipe;
 import vazkii.botania.common.block.ModSubtiles;
@@ -29,8 +28,7 @@ public class OrechidRecipeCategory extends OrechidRecipeCategoryBase {
 	public static final ResourceLocation UID = prefix("orechid");
 
 	public OrechidRecipeCategory(IGuiHelper guiHelper) {
-		super(guiHelper, new ItemStack(ModSubtiles.orechid), new ItemStack(Blocks.STONE, 64),
-				new TranslatableComponent("botania.nei.orechid"));
+		super(guiHelper, new ItemStack(ModSubtiles.orechid), new TranslatableComponent("botania.nei.orechid"));
 	}
 
 	@Nonnull
@@ -39,6 +37,7 @@ public class OrechidRecipeCategory extends OrechidRecipeCategoryBase {
 		return UID;
 	}
 
+	@Nonnull
 	@Override
 	public Class<? extends IOrechidRecipe> getRecipeClass() {
 		return RecipeOrechid.class;

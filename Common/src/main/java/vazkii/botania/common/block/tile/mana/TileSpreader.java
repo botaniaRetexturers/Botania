@@ -398,9 +398,8 @@ public class TileSpreader extends TileExposedSimpleInventory implements IManaCol
 				double angle = y * 180;
 				rotationY = -(float) angle;
 
-				checkForReceiver();
+				setChanged();
 				requestsClientUpdate = true;
-				VanillaPacketDispatcher.dispatchTEToNearbyPlayers(this);
 			}
 		}
 		return true;
@@ -644,15 +643,11 @@ public class TileSpreader extends TileExposedSimpleInventory implements IManaCol
 
 	@Override
 	public boolean bindTo(Player player, ItemStack wand, BlockPos pos, Direction side) {
-		Vec3 thisVec = Vec3.atCenterOf(getBlockPos());
-		Vec3 blockVec = Vec3.atCenterOf(pos);
-
 		VoxelShape shape = player.level.getBlockState(pos).getShape(player.level, pos);
 		AABB axis = shape.isEmpty() ? new AABB(pos) : shape.bounds().move(pos);
 
-		if (!axis.contains(blockVec)) {
-			blockVec = new Vec3(axis.minX + (axis.maxX - axis.minX) / 2, axis.minY + (axis.maxY - axis.minY) / 2, axis.minZ + (axis.maxZ - axis.minZ) / 2);
-		}
+		Vec3 thisVec = Vec3.atCenterOf(getBlockPos());
+		Vec3 blockVec = new Vec3(axis.minX + (axis.maxX - axis.minX) / 2, axis.minY + (axis.maxY - axis.minY) / 2, axis.minZ + (axis.maxZ - axis.minZ) / 2);
 
 		Vec3 diffVec = blockVec.subtract(thisVec);
 		Vec3 diffVec2D = new Vec3(diffVec.x, diffVec.z, 0);
@@ -672,8 +667,7 @@ public class TileSpreader extends TileExposedSimpleInventory implements IManaCol
 		}
 		rotationY = (float) angle;
 
-		checkForReceiver();
-		VanillaPacketDispatcher.dispatchTEToNearbyPlayers(this);
+		setChanged();
 		return true;
 	}
 

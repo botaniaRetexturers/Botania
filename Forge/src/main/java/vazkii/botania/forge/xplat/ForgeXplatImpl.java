@@ -58,6 +58,9 @@ import net.minecraftforge.common.ForgeMod;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.common.extensions.IForgeMenuType;
+import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.energy.CapabilityEnergy;
+import net.minecraftforge.energy.IEnergyStorage;
 import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.fluids.FluidAttributes;
 import net.minecraftforge.fluids.FluidStack;
@@ -89,6 +92,7 @@ import vazkii.botania.api.item.IBlockProvider;
 import vazkii.botania.api.item.ICoordBoundItem;
 import vazkii.botania.api.mana.*;
 import vazkii.botania.api.recipe.ElvenPortalUpdateEvent;
+import vazkii.botania.common.block.tile.string.TileRedStringContainer;
 import vazkii.botania.common.brew.ModBrews;
 import vazkii.botania.common.handler.EquipmentHandler;
 import vazkii.botania.common.internal_caps.*;
@@ -270,7 +274,15 @@ public class ForgeXplatImpl implements IXplatAbstractions {
 
 	@Override
 	public KeptItemsComponent keptItemsComponent(Player player) {
-		return player.getCapability(ForgeInternalEntityCapabilities.KEPT_ITEMS).orElseThrow(IllegalStateException::new);
+		if (!player.isAlive()) {
+			// See the javadoc on reviveCaps for why this is necessary
+			player.reviveCaps();
+		}
+		var ret = player.getCapability(ForgeInternalEntityCapabilities.KEPT_ITEMS).orElseThrow(IllegalStateException::new);
+		if (!player.isAlive()) {
+			player.invalidateCaps();
+		}
+		return ret;
 	}
 
 	@Nullable
@@ -488,5 +500,57 @@ public class ForgeXplatImpl implements IXplatAbstractions {
 	@Override
 	public void addAxeStripping(Block input, Block output) {
 		CUSTOM_STRIPPABLES.put(input, output);
+	}
+
+	@Override
+	public int transferEnergyToNeighbors(Level level, BlockPos pos, int energy) {
+		for (Direction e : Direction.values()) {
+			BlockPos neighbor = pos.relative(e);
+			if (!level.hasChunkAt(neighbor)) {
+				continue;
+			}
+
+			BlockEntity be = level.getBlockEntity(neighbor);
+			if (be == null) {
+				continue;
+			}
+
+			LazyOptional<IEnergyStorage> storage = LazyOptional.empty();
+
+			if (be.getCapability(CapabilityEnergy.ENERGY, e.getOpposite()).isPresent()) {
+				storage = be.getCapability(CapabilityEnergy.ENERGY, e.getOpposite());
+			} else if (be.getCapability(CapabilityEnergy.ENERGY, null).isPresent()) {
+				storage = be.getCapability(CapabilityEnergy.ENERGY, null);
+			}
+
+			if (storage.isPresent()) {
+				energy -= storage.orElseThrow(NullPointerException::new).receiveEnergy(energy, false);
+
+				if (energy <= 0) {
+					return 0;
+				}
+			}
+		}
+		return energy;
+	}
+
+	@Override
+	public int getEnergyMultiplier() {
+		return 10;
+	}
+
+	@Override
+	public boolean isRedStringContainerTarget(BlockEntity be) {
+		for (Direction dir : Direction.values()) {
+			if (be.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, dir).isPresent()) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	@Override
+	public TileRedStringContainer newRedStringContainer(BlockPos pos, BlockState state) {
+		return new TileRedStringContainer(pos, state);
 	}
 }

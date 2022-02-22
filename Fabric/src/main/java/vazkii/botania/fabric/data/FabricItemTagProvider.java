@@ -11,6 +11,7 @@ import net.minecraft.world.item.DyeColor;
 import net.minecraft.world.item.Item;
 
 import vazkii.botania.common.block.ModBlocks;
+import vazkii.botania.common.item.relic.ItemDice;
 import vazkii.botania.xplat.IXplatAbstractions;
 
 import static vazkii.botania.common.item.ModItems.*;
@@ -18,6 +19,10 @@ import static vazkii.botania.common.item.ModItems.*;
 public class FabricItemTagProvider extends ItemTagsProvider {
 	public static final Tag.Named<Item> QUARTZ_BLOCKS = IXplatAbstractions.INSTANCE.itemTag(new ResourceLocation("c", "quartz_blocks"));
 	private static final Tag.Named<Item> MUSHROOMS = IXplatAbstractions.INSTANCE.itemTag(new ResourceLocation("c", "mushrooms"));
+	private static final Tag.Named<Item> GLASS = IXplatAbstractions.INSTANCE.itemTag(new ResourceLocation("c", "glass"));
+	private static final Tag.Named<Item> GLASS_ALT = IXplatAbstractions.INSTANCE.itemTag(new ResourceLocation("c", "glass_blocks"));
+	private static final Tag.Named<Item> GLASS_PANE = IXplatAbstractions.INSTANCE.itemTag(new ResourceLocation("c", "glass_pane"));
+	private static final Tag.Named<Item> GLASS_PANE_ALT = IXplatAbstractions.INSTANCE.itemTag(new ResourceLocation("c", "glass_panes"));
 
 	public FabricItemTagProvider(DataGenerator dataGenerator, BlockTagsProvider blockTagsProvider) {
 		super(dataGenerator, blockTagsProvider);
@@ -35,8 +40,13 @@ public class FabricItemTagProvider extends ItemTagsProvider {
 		}
 		this.copy(FabricBlockTagProvider.MUSHROOMS, MUSHROOMS);
 		this.copy(FabricBlockTagProvider.QUARTZ_BLOCKS, QUARTZ_BLOCKS);
+		this.copy(FabricBlockTagProvider.GLASS, GLASS);
+		this.copy(FabricBlockTagProvider.GLASS_ALT, GLASS_ALT);
+		this.copy(FabricBlockTagProvider.GLASS_PANE, GLASS_PANE);
+		this.copy(FabricBlockTagProvider.GLASS_PANE_ALT, GLASS_PANE_ALT);
 		generateToolTags();
 		generateAccessoryTags();
+		generateCompatTags();
 	}
 
 	private void generateToolTags() {
@@ -116,7 +126,13 @@ public class FabricItemTagProvider extends ItemTagsProvider {
 				tinyPotatoMask, questgiverMark,
 				thinkingHand
 		);
+	}
 
+	private void generateCompatTags() {
+		this.tag(TagFactory.ITEM.create(new ResourceLocation("modern_industrialization", "replicator_blacklist")))
+				.add(ItemDice.getRelics())
+				.add(dice, manaTablet, manaRing, manaRingGreater, blackerLotus, blackHoleTalisman, flowerBag,
+						spawnerMover, terraPick, ModBlocks.terrasteelBlock.asItem());
 	}
 
 	private static Tag.Named<Item> accessory(String name) {

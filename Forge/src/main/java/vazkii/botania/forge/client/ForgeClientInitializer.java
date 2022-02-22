@@ -52,7 +52,6 @@ import vazkii.botania.client.model.ModLayerDefinitions;
 import vazkii.botania.client.render.BlockRenderLayers;
 import vazkii.botania.client.render.ColorHandler;
 import vazkii.botania.client.render.entity.EntityRenderers;
-import vazkii.botania.client.render.world.WorldOverlays;
 import vazkii.botania.common.block.ModSubtiles;
 import vazkii.botania.common.block.tile.ModTiles;
 import vazkii.botania.common.item.ModItems;
@@ -101,8 +100,15 @@ public class ForgeClientInitializer {
 		bus.addListener((ScreenEvent.KeyboardKeyPressedEvent.Post e) -> CorporeaInputHandler.buttonPressed(e.getKeyCode(), e.getScanCode()));
 
 		// Forge bus events done with Mixins on Fabric
+		bus.addListener((RenderGameOverlayEvent.BossInfo e) -> {
+			var result = BossBarHandler.onBarRender(e.getMatrixStack(), e.getX(), e.getY(),
+					e.getBossEvent(), true);
+			result.ifPresent(increment -> {
+				e.setCanceled(true);
+				e.setIncrement(increment);
+			});
+		});
 		bus.addListener((RenderGameOverlayEvent.Text e) -> DebugHandler.onDrawDebugText(e.getLeft()));
-		bus.addListener((RenderLevelLastEvent e) -> WorldOverlays.renderWorldLast(e.getPartialTick(), e.getPoseStack()));
 		bus.addListener((InputEvent.KeyInputEvent e) -> {
 			ItemDodgeRing.ClientLogic.onKeyDown();
 			KonamiHandler.handleInput(e.getKey(), e.getAction(), e.getModifiers());

@@ -90,15 +90,18 @@ import vazkii.botania.api.item.IBlockProvider;
 import vazkii.botania.api.item.ICoordBoundItem;
 import vazkii.botania.api.mana.*;
 import vazkii.botania.api.recipe.ElvenPortalUpdateCallback;
+import vazkii.botania.common.block.tile.string.TileRedStringContainer;
 import vazkii.botania.common.handler.EquipmentHandler;
 import vazkii.botania.common.internal_caps.*;
 import vazkii.botania.common.item.equipment.ICustomDamageItem;
 import vazkii.botania.common.lib.LibMisc;
 import vazkii.botania.fabric.FabricBotaniaCreativeTab;
+import vazkii.botania.fabric.integration.tr_energy.FluxfieldTRStorage;
 import vazkii.botania.fabric.integration.trinkets.TrinketsIntegration;
 import vazkii.botania.fabric.internal_caps.CCAInternalEntityComponents;
 import vazkii.botania.fabric.mixin.FabricAccessorAbstractFurnaceBlockEntity;
 import vazkii.botania.fabric.mixin.FabricAccessorBucketItem;
+import vazkii.botania.fabric.tile.FabricTileRedStringContainer;
 import vazkii.botania.network.IPacket;
 import vazkii.botania.xplat.IXplatAbstractions;
 
@@ -572,5 +575,36 @@ public class FabricXplatImpl implements IXplatAbstractions {
 		} else {
 			CUSTOM_STRIPPING.put(input, output);
 		}
+	}
+
+	@Override
+	public int transferEnergyToNeighbors(Level level, BlockPos pos, int energy) {
+		if (isModLoaded("team_reborn_energy")) {
+			return FluxfieldTRStorage.transferEnergyToNeighbors(level, pos, energy);
+		}
+		return energy;
+	}
+
+	@Override
+	public int getEnergyMultiplier() {
+		return 3;
+	}
+
+	@Override
+	public boolean isRedStringContainerTarget(BlockEntity be) {
+		if (be.getLevel().isClientSide) {
+			return false;
+		}
+		for (Direction value : Direction.values()) {
+			if (ItemStorage.SIDED.find(be.getLevel(), be.getBlockPos(), be.getBlockState(), be, value) != null) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	@Override
+	public TileRedStringContainer newRedStringContainer(BlockPos pos, BlockState state) {
+		return new FabricTileRedStringContainer(pos, state);
 	}
 }
