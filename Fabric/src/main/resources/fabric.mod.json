@@ -34,8 +34,10 @@
       "vazkii.botania.test.block.OpenCrateTest",
       "vazkii.botania.test.block.PistonRelayTest",
       "vazkii.botania.test.block.InterceptorTest",
+      "vazkii.botania.test.block.RannuncarpusTest",
       "vazkii.botania.test.block.TargetBlockTest",
       "vazkii.botania.test.item.CacophoniumTest",
+      "vazkii.botania.test.item.FlowerBagTest",
       "vazkii.botania.test.item.SpawnerMoverTest",
       "vazkii.botania.test.item.lens.LensMineTest"
     ],
@@ -44,6 +46,9 @@
     ],
     "cardinal-components-entity": [
       "vazkii.botania.fabric.internal_caps.CCAInternalEntityComponents"
+    ],
+    "emi": [
+      "vazkii.botania.fabric.integration.emi.BotaniaEmiPlugin"
     ],
     "rei_plugins_v0": [
       "vazkii.botania.fabric.integration.rei.BotaniaREIPlugin"
@@ -57,8 +62,8 @@
 
   "depends": {
     "fabricloader": ">=0.12",
-    "fabric": ">=0.44",
-    "minecraft": ">=1.18.1",
+    "fabric": ">=0.50",
+    "minecraft": ">=1.18.2",
     "trinkets" : ">=3",
     "patchouli": "*"
   },

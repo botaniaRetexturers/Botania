@@ -35,7 +35,6 @@ import net.minecraftforge.fml.event.lifecycle.FMLLoadCompleteEvent;
 import vazkii.botania.api.BotaniaAPI;
 import vazkii.botania.api.BotaniaForgeClientCapabilities;
 import vazkii.botania.api.block.IWandHUD;
-import vazkii.botania.api.mana.IManaItem;
 import vazkii.botania.api.mana.ManaBarTooltip;
 import vazkii.botania.client.BotaniaItemProperties;
 import vazkii.botania.client.core.handler.*;
@@ -48,6 +47,7 @@ import vazkii.botania.client.gui.ManaBarTooltipComponent;
 import vazkii.botania.client.gui.TooltipHandler;
 import vazkii.botania.client.gui.bag.GuiFlowerBag;
 import vazkii.botania.client.gui.box.GuiBaubleBox;
+import vazkii.botania.client.integration.ears.EarsIntegration;
 import vazkii.botania.client.model.ModLayerDefinitions;
 import vazkii.botania.client.render.BlockRenderLayers;
 import vazkii.botania.client.render.ColorHandler;
@@ -60,6 +60,7 @@ import vazkii.botania.forge.CapabilityUtil;
 import vazkii.botania.forge.mixin.client.ForgeAccessorModelBakery;
 import vazkii.botania.mixin.client.AccessorRenderBuffers;
 import vazkii.botania.xplat.IClientXplatAbstractions;
+import vazkii.botania.xplat.IXplatAbstractions;
 import vazkii.patchouli.api.BookDrawScreenEvent;
 
 import java.io.IOException;
@@ -119,7 +120,8 @@ public class ForgeClientInitializer {
 			}
 		});
 		bus.addListener(EventPriority.LOWEST, (RenderTooltipEvent.Color e) -> {
-			if (!(e.getItemStack().getItem() instanceof IManaItem)) {
+			var manaItem = IXplatAbstractions.INSTANCE.findManaItem(e.getItemStack());
+			if (manaItem == null) {
 				return;
 			}
 			// Forge does not pass the tooltip width to any tooltip event.
@@ -142,6 +144,10 @@ public class ForgeClientInitializer {
 		ClientProxy.initSeasonal();
 		ClientProxy.initKeybindings(ClientRegistry::registerKeyBinding);
 		MinecraftForge.EVENT_BUS.addGenericListener(BlockEntity.class, ForgeClientInitializer::attachBeCapabilities);
+
+		if (IXplatAbstractions.INSTANCE.isModLoaded("ears")) {
+			EarsIntegration.register();
+		}
 	}
 
 	private static final Supplier<Map<BlockEntityType<?>, Function<BlockEntity, IWandHUD>>> WAND_HUD = Suppliers.memoize(() -> {

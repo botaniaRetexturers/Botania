@@ -227,7 +227,8 @@ public final class ForgeBotaniaConfig {
 		public final ForgeConfigSpec.ConfigValue<List<? extends String>> rannuncarpusItemBlacklist;
 		public final ForgeConfigSpec.ConfigValue<List<? extends String>> rannuncarpusModBlacklist;
 
-		public final ForgeConfigSpec.BooleanValue worldgenEnabled;
+		public final ForgeConfigSpec.BooleanValue worldgenFlowers;
+		public final ForgeConfigSpec.BooleanValue worldgenMushrooms;
 
 		public Common(ForgeConfigSpec.Builder builder) {
 			builder.push("blockBreakingParticles");
@@ -279,20 +280,25 @@ public final class ForgeBotaniaConfig {
 					.comment("Set this to false to disable spawning with a Lexica Botania in Garden of Glass worlds, if you are modifying the modpack's progression to not start with Botania.")
 					.define("gardenOfGlass.spawnWithLexicon", true);
 			gogIslandScaleMultiplier = builder
-					.comment("The multiplier for island distances for multiplayer Garden of Glass worlds.\n" +
-							"Islands are placed on a grid with 256 blocks between points, with the spawn island always being placed on 256, 256.\n" +
-							"By default, the scale is 8, putting each island on points separated by 2048 blocks.\n" +
-							"Values below 4 (1024 block spacing) are not recommended due to Nether portal collisions.")
+					.comment("""
+						The multiplier for island distances for multiplayer Garden of Glass worlds.
+						Islands are placed on a grid with 256 blocks between points, with the spawn island always being placed on 256, 256.
+						By default, the scale is 8, putting each island on points separated by 2048 blocks.
+						Values below 4 (1024 block spacing) are not recommended due to Nether portal collisions.""")
 					.defineInRange("gardenOfGlass.islandScaleMultiplier", 8, 1, 512);
 			orechidPriorityMods = builder
-					.comment("List of modids to prioritize when choosing a random ore from the tag.\n" +
-							"By default, the chosen ore is randomly picked from all ores in the ore's tag.\n" +
-							"Ores from mods present on this list will be picked over mods listed lower or not listed at all.\n" +
-							"Applying changes at runtime requires /reload afterwards.")
+					.comment("""
+						List of modids to prioritize when choosing a random ore from the tag.
+						By default, the chosen ore is randomly picked from all ores in the ore's tag.
+						Ores from mods present on this list will be picked over mods listed lower or not listed at all.
+						Applying changes at runtime requires /reload afterwards.""")
 					.defineList("orechidPriorityMods", Collections.emptyList(), o -> o instanceof String s && ResourceLocation.tryParse(s + ":test") != null);
-			worldgenEnabled = builder
-					.comment("Set this to false to disable mystical flower and mushroom worldgen. More fine-tuned customization should be done with datapacks.")
-					.define("worldgen", true);
+			worldgenFlowers = builder
+					.comment("Set this to false to disable mystical flower worldgen. More fine-tuned customization should be done with datapacks.")
+					.define("worldgenFlowers", true);
+			worldgenMushrooms = builder
+					.comment("Set this to false to disable mushroom worldgen. More fine-tuned customization should be done with datapacks.")
+					.define("worldgenMushrooms", true);
 			rannuncarpusItemBlacklist = builder
 					.comment("List of item registry names that will be ignored by rannuncarpuses when placing blocks.")
 					.defineList("rannuncarpus.itemBlacklist", Collections.emptyList(), o -> o instanceof String s && ResourceLocation.tryParse(s) != null);
@@ -368,8 +374,13 @@ public final class ForgeBotaniaConfig {
 		}
 
 		@Override
-		public boolean worldgenEnabled() {
-			return worldgenEnabled.get();
+		public boolean worldgenFlowers() {
+			return worldgenFlowers.get();
+		}
+
+		@Override
+		public boolean worldgenMushrooms() {
+			return worldgenMushrooms.get();
 		}
 
 		@SuppressWarnings("unchecked") // NightConfig's types are weird

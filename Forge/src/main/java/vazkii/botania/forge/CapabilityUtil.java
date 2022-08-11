@@ -34,7 +34,7 @@ public final class CapabilityUtil {
 		return new CapProvider<>(cap, lazyInstanceButNotReally);
 	}
 
-	public static <T extends SerializableComponent, U extends T> ICapabilityProvider makeSavedProvider(Capability<T> cap, T instance) {
+	public static <T extends SerializableComponent> ICapabilityProvider makeSavedProvider(Capability<T> cap, T instance) {
 		return new CapProviderSerializable<>(cap, instance);
 	}
 
@@ -72,8 +72,13 @@ public final class CapabilityUtil {
 	// todo this might need to be exposed in the API
 	@Nullable
 	public static <T> T findCapability(Capability<T> capability, Level level, BlockPos pos, BlockState state, @Nullable BlockEntity be) {
+		return findCapability(capability, level, pos, state, be, null);
+	}
+
+	@Nullable
+	public static <T> T findCapability(Capability<T> capability, Level level, BlockPos pos, BlockState state, @Nullable BlockEntity be, @Nullable Direction direction) {
 		if (be != null) {
-			var instance = be.getCapability(capability);
+			var instance = be.getCapability(capability, direction);
 			if (instance.isPresent()) {
 				return instance.orElseThrow(NullPointerException::new);
 			}

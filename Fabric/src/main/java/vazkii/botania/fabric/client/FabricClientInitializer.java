@@ -44,6 +44,7 @@ import vazkii.botania.client.gui.ManaBarTooltipComponent;
 import vazkii.botania.client.gui.TooltipHandler;
 import vazkii.botania.client.gui.bag.GuiFlowerBag;
 import vazkii.botania.client.gui.box.GuiBaubleBox;
+import vazkii.botania.client.integration.ears.EarsIntegration;
 import vazkii.botania.client.model.ModLayerDefinitions;
 import vazkii.botania.client.model.armor.ArmorModels;
 import vazkii.botania.client.render.BlockRenderLayers;
@@ -63,8 +64,6 @@ import vazkii.patchouli.api.BookDrawScreenCallback;
 
 import java.util.SortedMap;
 import java.util.function.Function;
-
-import static vazkii.botania.common.block.ModSubtiles.*;
 
 public class FabricClientInitializer implements ClientModInitializer {
 	@Override
@@ -119,6 +118,10 @@ public class FabricClientInitializer implements ClientModInitializer {
 
 		registerArmors();
 		registerCapabilities();
+
+		if (IXplatAbstractions.INSTANCE.isModLoaded("ears")) {
+			EarsIntegration.register();
+		}
 	}
 
 	private static void registerCapabilities() {

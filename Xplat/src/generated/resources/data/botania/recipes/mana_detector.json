@@ -1,0 +1,22 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "pattern": [
+    "RSR",
+    "STS",
+    "RSR"
+  ],
+  "key": {
+    "R": {
+      "item": "minecraft:redstone"
+    },
+    "T": {
+      "item": "minecraft:target"
+    },
+    "S": {
+      "item": "botania:livingrock"
+    }
+  },
+  "result": {
+    "item": "botania:mana_detector"
+  }
+}

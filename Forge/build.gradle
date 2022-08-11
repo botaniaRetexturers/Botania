@@ -42,6 +42,13 @@ repositories {
         name = "C4"
         url = "https://maven.theillusivec4.top/"
     }
+    maven {
+        name = "Unascribed"
+        url "https://repo.unascribed.com" // for ears
+        content {
+            includeGroup "com.unascribed"
+        }
+    }
 }
 
 minecraft {
@@ -57,7 +64,7 @@ minecraft {
             mods {
                 botania {
                     source sourceSets.main
-                    source project(":Common").sourceSets.main
+                    source project(":Xplat").sourceSets.main
                 }
             }
         }
@@ -70,7 +77,7 @@ minecraft {
             mods {
                 botania {
                     source sourceSets.main
-                    source project(":Common").sourceSets.main
+                    source project(":Xplat").sourceSets.main
                 }
             }
         }
@@ -84,7 +91,7 @@ minecraft {
             mods {
                 botania {
                     source sourceSets.main
-                    source project(":Common").sourceSets.main
+                    source project(":Xplat").sourceSets.main
                 }
             }
             args '--mod', 'botania', '--all', '--output', '"' + file('src/generated/resources/') + '"'
@@ -93,23 +100,31 @@ minecraft {
 }
 
 dependencies {
-    minecraft "net.minecraftforge:forge:${minecraft_version}-39.0.58"
-    compileOnly project(":Common")
+    minecraft "net.minecraftforge:forge:${minecraft_version}-40.1.68"
+    compileOnly project(":Xplat")
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 
     implementation "com.google.code.findbugs:jsr305:3.0.2"
 
-    implementation fg.deobf("vazkii.patchouli:Patchouli:1.18.1-64")
-    compileOnly fg.deobf("mezz.jei:jei-${minecraft_version}:9.1.0.44:api")
-    runtimeOnly fg.deobf("mezz.jei:jei-${minecraft_version}:9.1.0.44")
+    implementation fg.deobf("vazkii.patchouli:Patchouli:1.18.2-67")
+    compileOnly fg.deobf("mezz.jei:jei-1.18.2:9.4.3.122:api")
+    runtimeOnly fg.deobf("mezz.jei:jei-1.18.2:9.4.3.122")
 
-    compileOnly fg.deobf("top.theillusivec4.curios:curios-forge:1.18.1-5.0.5.1:api")
-    runtimeOnly fg.deobf("top.theillusivec4.curios:curios-forge:1.18.1-5.0.5.1")
+    compileOnly fg.deobf("top.theillusivec4.curios:curios-forge:1.18.2-5.0.6.3:api")
+    runtimeOnly fg.deobf("top.theillusivec4.curios:curios-forge:1.18.2-5.0.6.3")
+
+    compileOnly fg.deobf('com.blamejared.crafttweaker:CraftTweaker-forge-1.18.2:9.1.123')
+
+    compileOnly fg.deobf('com.unascribed:ears-api:1.4.5')
 }
 
 compileJava {
-    source(project(":Common").sourceSets.main.allSource)
+    source(project(":Xplat").sourceSets.main.allSource)
     options.compilerArgs << "-Xlint:all,-classfile,-processing,-deprecation,-serial" << "-Werror"
+}
+
+sourcesJar {
+    from project(":Xplat").sourceSets.main.allJava
 }
 
 sourceSets.main.resources {
@@ -117,7 +132,7 @@ sourceSets.main.resources {
 }
 
 processResources {
-    from project(":Common").sourceSets.main.resources
+    from project(":Xplat").sourceSets.main.resources
     inputs.property "version", project.version
 
     filesMatching("mods.toml") {
@@ -143,8 +158,10 @@ jar {
 
 task apiJar(type: Jar, dependsOn: classes) {
     // Sources included because of MinecraftForge/ForgeGradle#369
+    from project(":Xplat").sourceSets.main.allJava
     from(sourceSets.main.allJava)
     from(sourceSets.main.output)
+
     include 'vazkii/botania/api/**'
 
     archiveClassifier = 'api'

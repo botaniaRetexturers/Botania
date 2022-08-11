@@ -1,0 +1,14 @@
+{
+  "type": "botania:marimorphosis",
+  "input": "minecraft:stone",
+  "output": {
+    "type": "block",
+    "block": "botania:metamorphic_mountain_stone"
+  },
+  "weight": 1,
+  "biomes": [
+    "extreme_hills",
+    "mountain"
+  ],
+  "biome_bonus": 11
+}
